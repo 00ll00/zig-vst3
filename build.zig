@@ -437,10 +437,10 @@ fn addVst3ValidationStep(
     const validate_step = b.step(step_name, b.fmt("Build and validate the native {s} VST3 bundle", .{options.display_name}));
     if (target.result.os.tag == .macos or target.result.os.tag == .linux) {
         validate_step.dependOn(bundle_step);
-        const validate = b.addSystemCommand(&.{
-            "scripts/validate.sh",
-            b.getInstallPath(.prefix, b.fmt("bundle/{s}.vst3", .{options.artifact_name})),
-        });
+        const validate = b.addSystemCommand(&.{"scripts/validate.sh"});
+        validate.addFileArg(
+            b.graph.path(.install_prefix, b.fmt("bundle/{s}.vst3", .{options.artifact_name})),
+        );
         validate.step.dependOn(bundle_step);
         validate_step.dependOn(&validate.step);
     } else {
@@ -459,10 +459,8 @@ fn addPluginvalStep(
     const pluginval_step = b.step(step_name, b.fmt("Build and run pluginval for the native {s} VST3 bundle", .{options.display_name}));
     if (target.result.os.tag == .macos or target.result.os.tag == .linux or target.result.os.tag == .windows) {
         pluginval_step.dependOn(bundle_step);
-        const pluginval = b.addSystemCommand(&.{
-            "scripts/pluginval.sh",
-            b.getInstallPath(.prefix, b.fmt("bundle/{s}.vst3", .{options.artifact_name})),
-        });
+        const pluginval = b.addSystemCommand(&.{"scripts/pluginval.sh"});
+        pluginval.addFileArg(b.graph.path(.install_prefix, b.fmt("bundle/{s}.vst3", .{options.artifact_name})));
         if (options.strictness) |strictness| {
             pluginval.setEnvironmentVariable("PLUGINVAL_STRICTNESS", strictness);
         }
@@ -667,8 +665,8 @@ fn addVst3BundleSteps(
     if (target.result.os.tag == .macos) {
         const bundle = b.addSystemCommand(&.{"scripts/bundle_macos_vst3.sh"});
         bundle.addFileArg(library.getEmittedBin());
+        bundle.addFileArg(b.graph.path(.install_prefix, b.fmt("bundle/{s}.vst3", .{options.artifact_name})));
         bundle.addArgs(&.{
-            b.getInstallPath(.prefix, b.fmt("bundle/{s}.vst3", .{options.artifact_name})),
             options.bundle_id,
             "0.2.1",
             options.artifact_name,
@@ -677,8 +675,8 @@ fn addVst3BundleSteps(
     } else if (target.result.os.tag == .linux) {
         const bundle = b.addSystemCommand(&.{"scripts/bundle_linux_vst3.sh"});
         bundle.addFileArg(library.getEmittedBin());
+        bundle.addFileArg(b.graph.path(.install_prefix, b.fmt("bundle/{s}.vst3", .{options.artifact_name})));
         bundle.addArgs(&.{
-            b.getInstallPath(.prefix, b.fmt("bundle/{s}.vst3", .{options.artifact_name})),
             linuxPlatformDir(target.result.cpu.arch),
             options.artifact_name,
         });
@@ -692,8 +690,8 @@ fn addVst3BundleSteps(
     if (target.result.os.tag == .linux) {
         const bundle_linux = b.addSystemCommand(&.{"scripts/bundle_linux_vst3.sh"});
         bundle_linux.addFileArg(library.getEmittedBin());
+        bundle_linux.addFileArg(b.graph.path(.install_prefix, b.fmt("bundle/{s}_linux.vst3", .{options.artifact_name})));
         bundle_linux.addArgs(&.{
-            b.getInstallPath(.prefix, b.fmt("bundle/{s}_linux.vst3", .{options.artifact_name})),
             linuxPlatformDir(target.result.cpu.arch),
             b.fmt("{s}_linux", .{options.artifact_name}),
         });
@@ -707,8 +705,8 @@ fn addVst3BundleSteps(
     if (target.result.os.tag == .windows) {
         const bundle_windows = b.addSystemCommand(&.{"scripts/bundle_windows_vst3.sh"});
         bundle_windows.addFileArg(library.getEmittedBin());
+        bundle_windows.addFileArg(b.graph.path(.install_prefix, b.fmt("bundle/{s}_windows.vst3", .{options.artifact_name})));
         bundle_windows.addArgs(&.{
-            b.getInstallPath(.prefix, b.fmt("bundle/{s}_windows.vst3", .{options.artifact_name})),
             windowsPlatformDir(target.result.cpu.arch),
             b.fmt("{s}_windows", .{options.artifact_name}),
         });
