@@ -108,11 +108,11 @@ pub fn ConnectionPoint(comptime Config: type) type {
 
 test "connection point preserves peer when delegated connection changes fail" {
     const Config = struct {
-        fn connect(_: anytype, peer: ?*ivstmessage.IConnectionPoint) types.tresult {
+        pub fn connect(_: anytype, peer: ?*ivstmessage.IConnectionPoint) types.tresult {
             return if (peer == null) types.kInvalidArgument else types.kResultFalse;
         }
 
-        fn disconnect(_: anytype, _: ?*ivstmessage.IConnectionPoint) types.tresult {
+        pub fn disconnect(_: anytype, _: ?*ivstmessage.IConnectionPoint) types.tresult {
             return types.kResultFalse;
         }
     };

@@ -79,7 +79,7 @@ test "plug frame delegates resize requests to config" {
         var resize_count: types.uint32 = 0;
         var last_width: types.int32 = 0;
 
-        fn resizeView(_: ?*iplugview.IPlugView, rect: *iplugview.ViewRect) types.tresult {
+        pub fn resizeView(_: ?*iplugview.IPlugView, rect: *iplugview.ViewRect) types.tresult {
             resize_count += 1;
             last_width = rect.right - rect.left;
             return types.kResultFalse;
@@ -98,7 +98,7 @@ test "plug frame delegates resize requests to config" {
 
 test "plug frame stores accepted delegated resize state" {
     const Config = struct {
-        fn resizeView(_: ?*iplugview.IPlugView, rect: *iplugview.ViewRect) types.tresult {
+        pub fn resizeView(_: ?*iplugview.IPlugView, rect: *iplugview.ViewRect) types.tresult {
             rect.right = rect.left + 640;
             rect.bottom = rect.top + 480;
             return types.kResultOk;
@@ -118,7 +118,7 @@ test "plug frame stores accepted delegated resize state" {
 
 test "plug frame preserves accepted resize state when delegation fails" {
     const Config = struct {
-        fn resizeView(_: ?*iplugview.IPlugView, _: *iplugview.ViewRect) types.tresult {
+        pub fn resizeView(_: ?*iplugview.IPlugView, _: *iplugview.ViewRect) types.tresult {
             return types.kResultFalse;
         }
     };

@@ -66,7 +66,7 @@ test "cloneable delegates to config clone hook" {
     const Config = struct {
         var clone_target: u32 = 123;
 
-        fn clone(_: *anyopaque) ?*anyopaque {
+        pub fn clone(_: *anyopaque) ?*anyopaque {
             return &clone_target;
         }
     };
